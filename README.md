@@ -8,6 +8,8 @@
 <dt><h3>How to build Docker image:</h3></dt>
 <hr>
 
-`docker build -t salsh/pdf2png:latest`
-`docker run -p 8080:8080 -t salsh/pdf2png:latest`
+```
+docker build -t salsh/pdf2png:latest
+docker run -p 8080:8080 -t salsh/pdf2png:latest
+```
 </dl>
