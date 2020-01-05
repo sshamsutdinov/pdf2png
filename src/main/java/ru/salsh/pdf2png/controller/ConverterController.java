@@ -8,40 +8,54 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 import ru.salsh.pdf2png.service.ConverterService;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @Controller
 public class ConverterController {
 
-	private static final Logger logger = LoggerFactory.getLogger(ConverterController.class);
-
 	@Autowired
 	private ConverterService converterService;
 
-	@PostMapping(value = "/api/pdf2png", consumes = "multipart/form-data",produces = "application/zip")
-	public ResponseEntity<Resource> pdf2png(@RequestParam("file") MultipartFile file) {
+	@PostMapping(value = "/api/pdf2png", consumes = "multipart/form-data", produces = "application/zip")
+	public ResponseEntity<Resource> pdf2png(@RequestParam("file") MultipartFile file, HttpServletResponse resp) {
 		if (file.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
 
 		Resource resource = converterService.convertToPng(file);
 
-		String originalFilename = file.getOriginalFilename();
-		String filename = originalFilename.substring(0, originalFilename.lastIndexOf("."));
+		String filename = filenameWithoutExt(file.getOriginalFilename());
 		filename = new String(filename.getBytes(), StandardCharsets.ISO_8859_1);
+
 
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s.zip\"", filename))
 				.body(resource);
 	}
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String test() {
-		return "testView";
+	@PostMapping(value = "/apiv2/pdf2png", consumes = "multipart/form-data")
+	public void pdf2pngV2(@RequestParam("file") MultipartFile file, HttpServletResponse resp) throws IOException {
+		byte[] fileBytes = file.getBytes();
+		String filename = filenameWithoutExt(file.getOriginalFilename());
+		String extension = "png";
+
+		resp.setContentType("application/zip");
+		resp.addHeader("Content-Disposition", String.format("attachment; filename=\"%s.zip\"", filename));
+		resp.setStatus(HttpStatus.OK.value());
+
+		ServletOutputStream zipFile = resp.getOutputStream();
+		converterService.zipImages(zipFile, filename, fileBytes, extension);
+	}
+
+	private String filenameWithoutExt(String filename) {
+		return filename.substring(0, filename.lastIndexOf("."));
 	}
 }

@@ -15,6 +15,7 @@ import ru.salsh.pdf2png.exception.UploadedFileIsNotPdfException;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -60,8 +61,13 @@ public class PDFBoxConverterService implements ConverterService {
 
 	private ByteArrayOutputStream getZippedImages(String filename, byte[] fileBytes, String extension) {
 		ByteArrayOutputStream zipFile = new ByteArrayOutputStream();
+		zipImages(zipFile, filename, fileBytes, extension);
 
-		try (ZipOutputStream zipOut = new ZipOutputStream(zipFile);
+		return zipFile;
+	}
+
+	public void zipImages(OutputStream outputStream, String filename, byte[] fileBytes, String extension) {
+		try (ZipOutputStream zipOut = new ZipOutputStream(outputStream);
 		     PDDocument pdf = PDDocument.load(fileBytes)) {
 
 			PDFRenderer pdfRenderer = new PDFRenderer(pdf);
@@ -82,8 +88,5 @@ public class PDFBoxConverterService implements ConverterService {
 		} catch (IOException e) {
 			logger.error("", e);
 		}
-
-
-		return zipFile;
 	}
 }
