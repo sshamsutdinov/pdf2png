@@ -10,6 +10,6 @@
 
 ```
 docker build -t salsh/pdf2png:latest
-docker run -p 8080:8080 -t salsh/pdf2png:latest
+docker run -it -p 8083:8080 --rm salsh97/pdf2png
 ```
 </dl>
