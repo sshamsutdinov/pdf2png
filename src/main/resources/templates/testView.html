@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <title>Test</title>
 </head>
 <body>
-<form method="post" action="http://localhost:8080/api/pdf2png" enctype="multipart/form-data">
+<form method="post" th:action="@{/api/pdf2png}" enctype="multipart/form-data">
     PDF file <input type="file" name="file"/><br/>
     <input type="submit" value="Send"/>
 </form>
