@@ -40,7 +40,7 @@ public class ConverterController {
 				.body(resource);
 	}
 
-	@RequestMapping(value = "/api/test", method = RequestMethod.GET)
+	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String test() {
 		return "testView";
 	}
