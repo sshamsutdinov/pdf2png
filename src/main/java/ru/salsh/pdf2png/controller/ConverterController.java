@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import ru.salsh.pdf2png.exception.NoContentException;
 import ru.salsh.pdf2png.service.ConverterService;
 
 import javax.servlet.ServletOutputStream;
@@ -27,15 +28,10 @@ public class ConverterController {
 	@PostMapping(value = "/api/pdf2png", consumes = "multipart/form-data", produces = "application/zip")
 	public ResponseEntity<Resource> pdf2png(@RequestParam("file") MultipartFile file, HttpServletResponse resp) {
 		if (file.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			noContent();
 		}
-
 		Resource resource = converterService.convertToPng(file);
-
 		String filename = filenameWithoutExt(file.getOriginalFilename());
-		filename = new String(filename.getBytes(), StandardCharsets.ISO_8859_1);
-
-
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s.zip\"", filename))
 				.body(resource);
@@ -43,6 +39,10 @@ public class ConverterController {
 
 	@PostMapping(value = "/apiv2/pdf2png", consumes = "multipart/form-data")
 	public void pdf2pngV2(@RequestParam("file") MultipartFile file, HttpServletResponse resp) throws IOException {
+		if (file.isEmpty()) {
+			noContent();
+		}
+
 		byte[] fileBytes = file.getBytes();
 		String filename = filenameWithoutExt(file.getOriginalFilename());
 		String extension = "png";
@@ -56,6 +56,15 @@ public class ConverterController {
 	}
 
 	private String filenameWithoutExt(String filename) {
-		return filename.substring(0, filename.lastIndexOf("."));
+		if (filename.contains(".pdf")) {
+			filename = filename.substring(0, filename.lastIndexOf("."));
+		}
+		filename = new String(filename.getBytes(), StandardCharsets.ISO_8859_1);
+
+		return filename;
+	}
+
+	public void noContent() {
+		throw new NoContentException();
 	}
 }

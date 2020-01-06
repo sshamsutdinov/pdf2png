@@ -75,8 +75,7 @@ public class PDFBoxConverterService implements ConverterService {
 			for (int page = 0; page < pdf.getNumberOfPages(); page++) {
 				BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(page, DPI);
 
-				String imageFilename = String.format("%s-%d.%s",
-						filename.substring(0, filename.lastIndexOf(".")), page, extension);
+				String imageFilename = String.format("%s-%d.%s", filename, page, extension);
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				ImageIOUtil.writeImage(bufferedImage, extension, baos, DPI);
 
