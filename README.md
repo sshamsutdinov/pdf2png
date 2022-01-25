@@ -11,5 +11,5 @@
 
 `docker build -t salsh/pdf2png:latest`
 
-`docker run -p 8080:8080 -t salsh/pdf2png:latest`
+`docker run -p 8080:8080 -t salsh97/pdf2png:latest`
 </dl>
